@@ -3,6 +3,7 @@ import Weather from "./Weather";
 import {GoogleApiWrapper} from "google-maps-react";
 import ReactDOM from 'react-dom';
 import MapContainer from './MapContainer';
+import WeatherForm from "./WeatherForm";
 
 let weatherKey = process.env.REACT_APP_WEATHER_API_KEY;
 
@@ -16,23 +17,21 @@ class WeatherList extends Component {
                 description: ''
             }],
             temp: '',
-            lon: '24.9382',
-            lat: '60.1699',
-            city: 'Helsinki',
+            lon: '',
+            lat: '',
+            city: '',
         };
     }
 
-    componentDidMount () {
-        const city = this.state.city;
+    componentDidMount() {
+        const city = 'Helsinki';
         fetch('http://api.openweathermap.org/data/2.5/weather?q=' + city + '&units=metric&APPID=' + weatherKey)
             .then((response) => {
                 return response.json();
             })
             .then(data => {
-                // console.log(data)
                 this.setState({
                     data: data.weather,
-                    city: data.name,
                     temp: data.main.temp,
                     lat: data.coord.lat,
                     lon: data.coord.lon
@@ -40,44 +39,28 @@ class WeatherList extends Component {
             });
     }
 
-    handleChange = (event) => {
-        this.setState({city: event.target.value});
-    }
-
-    handleClick = (event) => {
-        event.preventDefault();
-        const city = this.state.city;
-            fetch('http://api.openweathermap.org/data/2.5/weather?q=' + city + '&units=metric&APPID=' + weatherKey)
-                .then(response => response.json())
-                .then(data => this.setState({
-                    data: data.weather,
-                    temp: data.main.temp,
-                    lon: data.coord.lon,
-                    lat: data.coord.lat
-                }))
-                .then(this.setState({city: ''}));
-
+    callback = (value) => {
+        const newCity = value;
+        fetch('http://api.openweathermap.org/data/2.5/weather?q=' + newCity + '&units=metric&APPID=' + weatherKey)
+            .then(response => response.json())
+            .then(data => this.setState({
+                data: data.weather,
+                temp: data.main.temp,
+                lon: data.coord.lon,
+                lat: data.coord.lat,
+                city: data.name
+            }))
     }
 
     render() {
         const {data} = this.state;
         return (
             <div className="weatherList">
-                <div className="form">
-                    Select city: <br/>
-                    <input
-                        type="text"
-                        value={this.state.newCity}
-                        onChange={this.handleChange}
-                    />
-                    <button
-                        onClick={this.handleClick}>
-                        Submit
-                    </button>
-                </div>
+                <WeatherForm callback={this.callback}/>
+                <h3>{this.state.city}</h3>
                 <p>Today's weather forecast is:</p>
                 {data.map(hit =>
-                    <Weather key={hit.id} main={hit.main} description={hit.description}/>
+                    <Weather key={hit.id} description={hit.description}/>
                 )}
                 <p>{this.state.temp}&deg;C</p>
                 <div>

@@ -13,7 +13,6 @@ export class MapContainer extends React.Component {
             const maps = google.maps;
             const mapRef = this.refs.map;                                      // looks for HTML div ref 'map', look render below
             const latLng = new google.maps.LatLng(this.props.lat, this.props.lon);
-            console.log(this.props.lat);
             const node = ReactDOM.findDOMNode(mapRef);
             const mapConfig = Object.assign({}, {
                 center: latLng,                                              //set center to Helsinki
